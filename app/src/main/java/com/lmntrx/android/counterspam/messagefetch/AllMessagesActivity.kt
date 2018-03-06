@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -20,6 +21,8 @@ import android.widget.Toast
 import com.lmntrx.android.counterspam.INTENT_MODE_CHOOSER
 import com.lmntrx.android.counterspam.MODE_ALL
 import com.lmntrx.android.counterspam.R
+import com.lmntrx.android.counterspam.classifier
+import com.lmntrx.android.counterspam.classifier.SMS
 import kotlinx.android.synthetic.main.activity_all_messages.*
 import kotlinx.android.synthetic.main.message_layout.view.*
 
@@ -128,13 +131,19 @@ class AllMessagesActivity : AppCompatActivity() {
         override fun getItemCount(): Int = messages.size
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.sourceTextView.text = messages[position].source
+            Log.d("SPAM",classifier.classify(SMS(messages[position].source,messages[position].content,"")).toString() + " " + messages[position].content)
+            if (classifier.classify(SMS(messages[position].source,messages[position].content,""))){
+                holder.sourceTextView.text = "SPAM!!!!"
+            }else{
+                holder.sourceTextView.text = messages[position].source
+            }
             holder.contentTextView.text = messages[position].content
         }
 
         class ViewHolder(rootView: View): RecyclerView.ViewHolder(rootView) {
             var sourceTextView: TextView = rootView.messageSourceTextView
             var contentTextView: TextView = rootView.messageContentTextView
+            var card: CardView = rootView.cardLayout
         }
 
     }
