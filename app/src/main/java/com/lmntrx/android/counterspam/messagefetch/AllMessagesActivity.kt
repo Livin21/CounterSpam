@@ -135,7 +135,11 @@ class AllMessagesActivity : AppCompatActivity() {
                             it.content.toLowerCase().contains("otp") ||
                             it.content.toLowerCase().contains("one time password") ||
                             it.content.toLowerCase().contains("verification code") ||
-                            it.content.toLowerCase().contains("code")
+                            it.content.toLowerCase().contains("whatsapp code") ||
+                            it.content.toLowerCase().contains("telegram code") ||
+                            it.content.toLowerCase().contains("messenger code") ||
+                            it.content.toLowerCase().contains("connection code") ||
+                            it.content.toLowerCase().contains("registration code")
                     ){
                         modifiedArray.add(it)
                     }
