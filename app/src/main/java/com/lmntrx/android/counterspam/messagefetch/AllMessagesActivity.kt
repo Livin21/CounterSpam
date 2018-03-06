@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -18,10 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import com.lmntrx.android.counterspam.INTENT_MODE_CHOOSER
-import com.lmntrx.android.counterspam.MODE_ALL
-import com.lmntrx.android.counterspam.R
-import com.lmntrx.android.counterspam.classifier
+import com.lmntrx.android.counterspam.*
 import com.lmntrx.android.counterspam.classifier.SMS
 import kotlinx.android.synthetic.main.activity_all_messages.*
 import kotlinx.android.synthetic.main.message_layout.view.*
@@ -39,7 +35,7 @@ class AllMessagesActivity : AppCompatActivity() {
 
         MODE = intent.getIntExtra(INTENT_MODE_CHOOSER, MODE_ALL)
 
-        if (checkSmsPermission()){
+        if (checkSmsPermission()) {
             loadMessages()
         }
 
@@ -61,7 +57,7 @@ class AllMessagesActivity : AppCompatActivity() {
 
         while (cursor.moveToNext()) {
             messages.add(Message(cursor.getString(1), cursor.getString(3)))
-            Log.d("From","number: ${cursor.getString(1)}")
+            Log.d("From", "number: ${cursor.getString(1)}")
         }
 
         cursor.close()
@@ -73,9 +69,33 @@ class AllMessagesActivity : AppCompatActivity() {
     }
 
     private fun showMessages(messages: ArrayList<Message>) {
+        val smss = filterMessages(MODE, messages)
         allMessagesRecyclerView.layoutManager = LinearLayoutManager(this)
-        allMessagesRecyclerView.adapter = MessageAdapter(this, messages)
+        allMessagesRecyclerView.adapter = MessageAdapter(this, smss)
     }
+
+    private fun filterMessages(mode: Int, messages: ArrayList<Message>): ArrayList<Message> =
+        when (mode){
+            MODE_SPAM -> {
+                val modifiedArray = ArrayList<Message>()
+                messages.forEach{
+                    if (classifier.classify(SMS(it.source,it.content,""))){
+                        modifiedArray.add(it)
+                    }
+                }
+                modifiedArray
+            }
+            MODE_NON_SPAM -> {
+                val modifiedArray = ArrayList<Message>()
+                messages.forEach{
+                    if (!classifier.classify(SMS(it.source,it.content,""))){
+                        modifiedArray.add(it)
+                    }
+                }
+                modifiedArray
+            }
+            else -> messages
+        }
 
     private fun checkSmsPermission(): Boolean {
 
@@ -104,46 +124,40 @@ class AllMessagesActivity : AppCompatActivity() {
         when (requestCode) {
             PERMISSIONS_REQUEST_READ_SMS -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (ContextCompat.checkSelfPermission(this,
-                                android.Manifest.permission.READ_SMS)
-                        == PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(this,
+                                    android.Manifest.permission.READ_SMS)
+                            == PackageManager.PERMISSION_GRANTED) {
 
-                    loadMessages()
+                        loadMessages()
 
-                    return
+                        return
+                    }
+                } else {
+                    Toast.makeText(applicationContext, "permission denied", Toast.LENGTH_LONG).show()
                 }
-            } else {
-                Toast.makeText(applicationContext, "permission denied", Toast.LENGTH_LONG).show()
-            }
                 return
             }
         }
 
     }
 
-    class MessageAdapter(private val context: Context, private val messages: ArrayList<Message>): RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
+    class MessageAdapter(private val context: Context, private val messages: ArrayList<Message>) : RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder{
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
             val layoutInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            return ViewHolder(layoutInflater.inflate(R.layout.message_layout, parent,false))
+            return ViewHolder(layoutInflater.inflate(R.layout.message_layout, parent, false))
         }
 
         override fun getItemCount(): Int = messages.size
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            Log.d("SPAM",classifier.classify(SMS(messages[position].source,messages[position].content,"")).toString() + " " + messages[position].content)
-            if (classifier.classify(SMS(messages[position].source,messages[position].content,""))){
-                holder.sourceTextView.text = "SPAM!!!!"
-            }else{
-                holder.sourceTextView.text = messages[position].source
-            }
+            holder.sourceTextView.text = messages[position].source
             holder.contentTextView.text = messages[position].content
         }
 
-        class ViewHolder(rootView: View): RecyclerView.ViewHolder(rootView) {
+        class ViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
             var sourceTextView: TextView = rootView.messageSourceTextView
             var contentTextView: TextView = rootView.messageContentTextView
-            var card: CardView = rootView.cardLayout
         }
 
     }
