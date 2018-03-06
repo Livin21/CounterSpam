@@ -3,4 +3,6 @@
     <string name="show_all_messages">Show All Messages</string>
     <string name="show_non_spam_messages">Show Non Spam Messages</string>
     <string name="show_spam_messages">Show Spam Messages</string>
+    <string name="show_otp_messages">Show OTP Messages</string>
+    <string name="missed_call_messages">Missed Call Messages</string>
 </resources>

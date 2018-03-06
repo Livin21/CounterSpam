@@ -24,6 +24,14 @@ class MainActivity : AppCompatActivity() {
             launchActivity(MODE_NON_SPAM)
         }
 
+        otpMessagesButton.setOnClickListener {
+            launchActivity(MODE_OTP)
+        }
+
+        missedCallMessagesButton.setOnClickListener {
+            launchActivity(MODE_MISSED_CALL)
+        }
+
     }
 
     private fun launchActivity(mode: Int) {

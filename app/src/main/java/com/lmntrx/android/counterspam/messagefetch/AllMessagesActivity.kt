@@ -77,6 +77,7 @@ class AllMessagesActivity : AppCompatActivity() {
     private fun filterMessages(mode: Int, messages: ArrayList<Message>): ArrayList<Message> =
         when (mode){
             MODE_SPAM -> {
+                supportActionBar?.title = "Spam Messages"
                 val modifiedArray = ArrayList<Message>()
                 messages.forEach{
                     if (classifier.classify(SMS(it.source,it.content,""))){
@@ -86,15 +87,47 @@ class AllMessagesActivity : AppCompatActivity() {
                 modifiedArray
             }
             MODE_NON_SPAM -> {
+                supportActionBar?.title = "Non Spam Messages"
                 val modifiedArray = ArrayList<Message>()
                 messages.forEach{
                     if (!classifier.classify(SMS(it.source,it.content,""))){
+                        if (!it.source.toLowerCase().contains("wappush"))
+                            modifiedArray.add(it)
+                    }
+                }
+                modifiedArray
+            }
+            MODE_OTP -> {
+                supportActionBar?.title = "OTP Messages"
+                val modifiedArray = ArrayList<Message>()
+                messages.forEach{
+                    if (
+                            it.content.toLowerCase().contains("otp") ||
+                            it.content.toLowerCase().contains("one time password") ||
+                            it.content.toLowerCase().contains("verification code") ||
+                            it.content.toLowerCase().contains("code")
+                    ){
                         modifiedArray.add(it)
                     }
                 }
                 modifiedArray
             }
-            else -> messages
+            MODE_MISSED_CALL -> {
+                supportActionBar?.title = "Missed Call Messages"
+                val modifiedArray = ArrayList<Message>()
+                messages.forEach{
+                    if (
+                            it.content.toLowerCase().contains("missed call")
+                    ){
+                        modifiedArray.add(it)
+                    }
+                }
+                modifiedArray
+            }
+            else -> {
+                supportActionBar?.title = "All Messages"
+                messages
+            }
         }
 
     private fun checkSmsPermission(): Boolean {
