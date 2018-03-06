@@ -15,15 +15,15 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" />
         <activity android:name=".messagefetch.AllMessagesActivity" />
-        <activity android:name=".FingerPrintActivity"/>
-        <activity android:name=".LauncherActivity" >
+        <activity android:name=".authentication.FingerPrintActivity"/>
+        <activity android:name=".authentication.LauncherActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CreatePinActivity"/>
+        <activity android:name=".authentication.CreatePinActivity"/>
     </application>
 
 </manifest>

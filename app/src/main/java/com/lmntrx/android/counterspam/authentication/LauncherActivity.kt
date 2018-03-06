@@ -1,4 +1,4 @@
-package com.lmntrx.android.counterspam
+package com.lmntrx.android.counterspam.authentication
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -11,6 +11,8 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Toast
+import com.lmntrx.android.counterspam.MainActivity
+import com.lmntrx.android.counterspam.R
 import kotlinx.android.synthetic.main.activity_launcher.*
 
 class LauncherActivity : AppCompatActivity() {

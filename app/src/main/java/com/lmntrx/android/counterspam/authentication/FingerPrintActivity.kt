@@ -1,4 +1,4 @@
-package com.lmntrx.android.counterspam
+package com.lmntrx.android.counterspam.authentication
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -14,6 +14,7 @@ import android.security.keystore.KeyProperties
 import android.support.annotation.RequiresApi
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
+import com.lmntrx.android.counterspam.R
 import kotlinx.android.synthetic.main.activity_finger_print.*
 import java.security.KeyStore
 import javax.crypto.Cipher

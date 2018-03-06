@@ -1,4 +1,4 @@
-package com.lmntrx.android.counterspam
+package com.lmntrx.android.counterspam.authentication
 
 import android.content.Context
 import android.content.Intent
@@ -6,6 +6,8 @@ import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import com.lmntrx.android.counterspam.MainActivity
+import com.lmntrx.android.counterspam.R
 import kotlinx.android.synthetic.main.activity_create_pin.*
 
 class CreatePinActivity : AppCompatActivity() {

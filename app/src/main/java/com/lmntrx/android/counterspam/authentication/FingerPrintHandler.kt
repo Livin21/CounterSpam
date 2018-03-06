@@ -1,4 +1,4 @@
-package com.lmntrx.android.counterspam
+package com.lmntrx.android.counterspam.authentication
 
 
 /***
@@ -18,6 +18,8 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.TextView
+import com.lmntrx.android.counterspam.MainActivity
+import com.lmntrx.android.counterspam.R
 
 
 @RequiresApi(Build.VERSION_CODES.M)
