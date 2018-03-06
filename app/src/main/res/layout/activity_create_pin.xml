@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:gravity="center"
+    tools:context="com.lmntrx.android.counterspam.CreatePinActivity">
+
+
+    <EditText
+        android:id="@+id/pinEntryField"
+        android:layout_margin="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_pin"
+        android:maxLines="1"
+        android:maxLength="4"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/pinConfirmField"
+        android:layout_margin="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="@string/confirm_pin"
+        android:maxLines="1"
+        android:maxLength="4"
+        android:inputType="number"/>
+
+    <Button
+        android:id="@+id/createPinButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/create_new_pin"/>
+
+
+
+</LinearLayout>
