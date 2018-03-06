@@ -219,7 +219,11 @@ class Classifier{
         if (!userDefinedSpam.isEmpty()){
             userDefinedSpam.forEach {
                 Log.d("spam msg", it)
-                val spamMessage = AllMessagesActivity.Message(it.split(" $delimiter ")[0], it.split(" $delimiter ")[1])
+                val spamMessage: AllMessagesActivity.Message = try {
+                    AllMessagesActivity.Message(it.split(" $delimiter ")[0], it.split(" $delimiter ")[1])
+                }catch (e: IndexOutOfBoundsException){
+                    AllMessagesActivity.Message("Unknown",it)
+                }
                 if (!modifiedArray.contains(spamMessage)){
                     modifiedArray.add(spamMessage)
                 }
@@ -229,7 +233,11 @@ class Classifier{
         if (!userDefinedHam.isEmpty()){
             userDefinedHam.forEach {
                 Log.d("spam msg", it)
-                val hamMessage = AllMessagesActivity.Message(it.split(" $delimiter ")[0], it.split(" $delimiter ")[1])
+                val hamMessage: AllMessagesActivity.Message = try {
+                    AllMessagesActivity.Message(it.split(" $delimiter ")[0], it.split(" $delimiter ")[1])
+                }catch (e: IndexOutOfBoundsException){
+                    AllMessagesActivity.Message("Unknown",it)
+                }
                 if (modifiedArray.contains(hamMessage)){
                     modifiedArray.remove(hamMessage)
                 }
@@ -244,7 +252,11 @@ class Classifier{
         if (!userDefinedSpam.isEmpty()){
             userDefinedSpam.forEach {
                 Log.d("spam msg", it)
-                val spamMessage = AllMessagesActivity.Message(it.split(" $delimiter ")[0], it.split(" $delimiter ")[1])
+                val spamMessage: AllMessagesActivity.Message = try {
+                    AllMessagesActivity.Message(it.split(" $delimiter ")[0], it.split(" $delimiter ")[1])
+                }catch (e: IndexOutOfBoundsException){
+                    AllMessagesActivity.Message("Unknown",it)
+                }
                 if (modifiedArray.contains(spamMessage)){
                     modifiedArray.remove(spamMessage)
                 }
@@ -254,7 +266,11 @@ class Classifier{
         if (!userDefinedHam.isEmpty()){
             userDefinedHam.forEach {
                 Log.d("spam msg", it)
-                val hamMessage = AllMessagesActivity.Message(it.split(" $delimiter ")[0], it.split(" $delimiter ")[1])
+                val hamMessage: AllMessagesActivity.Message = try {
+                    AllMessagesActivity.Message(it.split(" $delimiter ")[0], it.split(" $delimiter ")[1])
+                }catch (e: IndexOutOfBoundsException){
+                    AllMessagesActivity.Message("Unknown",it)
+                }
                 if (!modifiedArray.contains(hamMessage)){
                     modifiedArray.add(hamMessage)
                 }

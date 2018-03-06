@@ -174,8 +174,9 @@ class AllMessagesActivity : AppCompatActivity() {
                             .setTitle("Not Spam?")
                             .setPositiveButton("Yes") { dialog, _ ->
                                 classifier.updateDataSet(context, SMS(messages[position].source, messages[position].content,"ham"))
-                                messages.removeAt(position)
                                 notifyItemRemoved(position)
+                                messages.removeAt(position)
+                                notifyDataSetChanged()
                                 dialog.dismiss()
                             }
                             .setNegativeButton("No") { dialog, _ ->
@@ -188,8 +189,9 @@ class AllMessagesActivity : AppCompatActivity() {
                             .setTitle("Spam?")
                             .setPositiveButton("Yes") { dialog, _ ->
                                 classifier.updateDataSet(context, SMS(messages[position].source, messages[position].content,"spam"))
-                                messages.removeAt(position)
                                 notifyItemRemoved(position)
+                                messages.removeAt(position)
+                                notifyDataSetChanged()
                                 dialog.dismiss()
                             }
                             .setNegativeButton("No") { dialog, _ ->
