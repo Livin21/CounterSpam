@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.CardView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -64,9 +65,9 @@ class AllMessagesActivity : AppCompatActivity() {
                     }
                 }
                 if (key.isNullOrEmpty()){
-                    allMessagesRecyclerView.swapAdapter(MessageAdapter(this@AllMessagesActivity, filteredMessages), true)
+                    allMessagesRecyclerView.swapAdapter(MessageAdapter(this@AllMessagesActivity, filteredMessages, MODE), true)
                 }else{
-                    allMessagesRecyclerView.swapAdapter(MessageAdapter(this@AllMessagesActivity, modifiedArray), true)
+                    allMessagesRecyclerView.swapAdapter(MessageAdapter(this@AllMessagesActivity, modifiedArray, MODE), true)
                 }
             }
         })
@@ -92,7 +93,7 @@ class AllMessagesActivity : AppCompatActivity() {
 
         cursor.close()
 
-        filteredMessages = filterMessages(MODE, messages)
+        filteredMessages = classifier.filterMessages(this, MODE, messages)
         showMessages(filteredMessages)
 
         progressDialog.dismiss()
@@ -101,68 +102,8 @@ class AllMessagesActivity : AppCompatActivity() {
 
     private fun showMessages(messages: ArrayList<Message>) {
         allMessagesRecyclerView.layoutManager = LinearLayoutManager(this)
-        allMessagesRecyclerView.adapter = MessageAdapter(this, messages)
+        allMessagesRecyclerView.adapter = MessageAdapter(this, messages, MODE)
     }
-
-    private fun filterMessages(mode: Int, messages: ArrayList<Message>): ArrayList<Message> =
-        when (mode){
-            MODE_SPAM -> {
-                supportActionBar?.title = "Spam Messages"
-                val modifiedArray = ArrayList<Message>()
-                messages.forEach{
-                    if (classifier.classify(SMS(it.source,it.content,""))){
-                        modifiedArray.add(it)
-                    }
-                }
-                modifiedArray
-            }
-            MODE_NON_SPAM -> {
-                supportActionBar?.title = "Non Spam Messages"
-                val modifiedArray = ArrayList<Message>()
-                messages.forEach{
-                    if (!classifier.classify(SMS(it.source,it.content,""))){
-                        if (!it.source.toLowerCase().contains("wappush"))
-                            modifiedArray.add(it)
-                    }
-                }
-                modifiedArray
-            }
-            MODE_OTP -> {
-                supportActionBar?.title = "OTP Messages"
-                val modifiedArray = ArrayList<Message>()
-                messages.forEach{
-                    if (
-                            it.content.toLowerCase().contains("otp") ||
-                            it.content.toLowerCase().contains("one time password") ||
-                            it.content.toLowerCase().contains("verification code") ||
-                            it.content.toLowerCase().contains("whatsapp code") ||
-                            it.content.toLowerCase().contains("telegram code") ||
-                            it.content.toLowerCase().contains("messenger code") ||
-                            it.content.toLowerCase().contains("connection code") ||
-                            it.content.toLowerCase().contains("registration code")
-                    ){
-                        modifiedArray.add(it)
-                    }
-                }
-                modifiedArray
-            }
-            MODE_MISSED_CALL -> {
-                supportActionBar?.title = "Missed Call Alerts"
-                val modifiedArray = ArrayList<Message>()
-                messages.forEach{
-                    if (
-                            it.content.toLowerCase().contains("missed call")
-                    ){
-                        modifiedArray.add(it)
-                    }
-                }
-                modifiedArray
-            }
-            else -> {
-                supportActionBar?.title = "All Messages"
-                messages
-            }
-        }
 
     private fun checkSmsPermission(): Boolean {
 
@@ -208,7 +149,7 @@ class AllMessagesActivity : AppCompatActivity() {
 
     }
 
-    class MessageAdapter(private val context: Context, private val messages: ArrayList<Message>) : RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
+    class MessageAdapter(private val context: Context, private val messages: ArrayList<Message>, private val mode: Int) : RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
             val layoutInflater: LayoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -220,11 +161,50 @@ class AllMessagesActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             holder.sourceTextView.text = messages[position].source
             holder.contentTextView.text = messages[position].content
+            holder.card.setOnClickListener {
+                android.support.v7.app.AlertDialog.Builder(context)
+                        .setMessage(messages[position].content)
+                        .setTitle(messages[position].source)
+                        .show()
+            }
+            holder.card.setOnLongClickListener {
+                if (mode == MODE_SPAM){
+                    android.support.v7.app.AlertDialog.Builder(context)
+                            .setMessage("Remove this message from spam category?")
+                            .setTitle("Not Spam?")
+                            .setPositiveButton("Yes") { dialog, _ ->
+                                classifier.updateDataSet(context, SMS(messages[position].source, messages[position].content,"ham"))
+                                messages.removeAt(position)
+                                notifyItemRemoved(position)
+                                dialog.dismiss()
+                            }
+                            .setNegativeButton("No") { dialog, _ ->
+                                dialog.cancel()
+                            }
+                            .show()
+                }else if (mode ==  MODE_NON_SPAM){
+                    android.support.v7.app.AlertDialog.Builder(context)
+                            .setMessage("Add this message to spam category?")
+                            .setTitle("Spam?")
+                            .setPositiveButton("Yes") { dialog, _ ->
+                                classifier.updateDataSet(context, SMS(messages[position].source, messages[position].content,"spam"))
+                                messages.removeAt(position)
+                                notifyItemRemoved(position)
+                                dialog.dismiss()
+                            }
+                            .setNegativeButton("No") { dialog, _ ->
+                                dialog.cancel()
+                            }
+                            .show()
+                }
+                true
+            }
         }
 
         class ViewHolder(rootView: View) : RecyclerView.ViewHolder(rootView) {
             var sourceTextView: TextView = rootView.messageSourceTextView
             var contentTextView: TextView = rootView.messageContentTextView
+            var card: CardView = rootView.cardLayout
         }
 
     }
