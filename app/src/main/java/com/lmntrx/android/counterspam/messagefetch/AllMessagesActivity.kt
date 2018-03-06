@@ -11,6 +11,8 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +31,8 @@ class AllMessagesActivity : AppCompatActivity() {
 
     private val PERMISSIONS_REQUEST_READ_SMS = 0
 
+    private lateinit var filteredMessages: ArrayList<Message>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_all_messages)
@@ -37,9 +41,35 @@ class AllMessagesActivity : AppCompatActivity() {
 
         if (checkSmsPermission()) {
             loadMessages()
+
+            setUpSearch()
         }
 
 
+
+
+    }
+
+    private fun setUpSearch() {
+        searchField.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {}
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(key: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                val modifiedArray: ArrayList<Message> = ArrayList()
+                filteredMessages.forEach {
+                    if (it.source.toLowerCase().contains(key.toString().toLowerCase()) ||
+                            it.content.toLowerCase().contains(key.toString().toLowerCase())){
+                        modifiedArray.add(it)
+                    }
+                }
+                if (key.isNullOrEmpty()){
+                    allMessagesRecyclerView.swapAdapter(MessageAdapter(this@AllMessagesActivity, filteredMessages), true)
+                }else{
+                    allMessagesRecyclerView.swapAdapter(MessageAdapter(this@AllMessagesActivity, modifiedArray), true)
+                }
+            }
+        })
     }
 
     private fun loadMessages() {
@@ -62,16 +92,16 @@ class AllMessagesActivity : AppCompatActivity() {
 
         cursor.close()
 
-        showMessages(messages)
+        filteredMessages = filterMessages(MODE, messages)
+        showMessages(filteredMessages)
 
         progressDialog.dismiss()
 
     }
 
     private fun showMessages(messages: ArrayList<Message>) {
-        val smss = filterMessages(MODE, messages)
         allMessagesRecyclerView.layoutManager = LinearLayoutManager(this)
-        allMessagesRecyclerView.adapter = MessageAdapter(this, smss)
+        allMessagesRecyclerView.adapter = MessageAdapter(this, messages)
     }
 
     private fun filterMessages(mode: Int, messages: ArrayList<Message>): ArrayList<Message> =
@@ -113,7 +143,7 @@ class AllMessagesActivity : AppCompatActivity() {
                 modifiedArray
             }
             MODE_MISSED_CALL -> {
-                supportActionBar?.title = "Missed Call Messages"
+                supportActionBar?.title = "Missed Call Alerts"
                 val modifiedArray = ArrayList<Message>()
                 messages.forEach{
                     if (
