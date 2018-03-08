@@ -163,7 +163,7 @@ class Classifier {
                     it.write(spamData.toByteArray())
                 }
             } catch (e: FileNotFoundException) {
-                val spamData = "${sms.source} $delimiter ${sms.body}"
+                val spamData = "${sms.source} $delimiter ${sms.body.replace("\n"," ")}"
                 context.openFileOutput("spam", Context.MODE_PRIVATE).use {
                     it.write(spamData.toByteArray())
                 }
@@ -176,13 +176,13 @@ class Classifier {
                 hamReader.readLines().forEach {
                     hamData += "$it\n"
                 }
-                hamData += "${sms.source} $delimiter ${sms.body}"
+                hamData += "${sms.source} $delimiter ${sms.body.replace("\n"," ")}"
                 Log.d("spam msg", hamData)
                 context.openFileOutput("ham", Context.MODE_PRIVATE).use {
                     it.write(hamData.toByteArray())
                 }
             } catch (e: FileNotFoundException) {
-                val hamData = "${sms.source} $delimiter ${sms.body}"
+                val hamData = "${sms.source} $delimiter ${sms.body.replace("\n"," ")}"
                 context.openFileOutput("ham", Context.MODE_PRIVATE).use {
                     it.write(hamData.toByteArray())
                 }
