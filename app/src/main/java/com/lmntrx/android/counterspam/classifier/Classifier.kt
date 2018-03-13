@@ -31,7 +31,7 @@ class Classifier {
     }
 
     private fun readDataSet(context: Context) {
-        val reader = BufferedReader(InputStreamReader(context.resources.openRawResource(R.raw.english_big)))
+        val reader = BufferedReader(InputStreamReader(context.resources.openRawResource(R.raw.dataset)))
         var line = reader.readLine()
         while (line != null) {
             trainData.add(SMS("", line.split("-> ")[0], line.split("-> ")[1]))
